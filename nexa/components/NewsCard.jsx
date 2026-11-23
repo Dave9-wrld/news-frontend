@@ -58,7 +58,7 @@ export default function NewsCard({
   };
 
   return (
-    <article className="flex flex-col justify-between rounded-xl bg-white border border-[#e1ece5] hover:border-[#a7ccb5] hover:shadow-[0_4px_20px_rgba(22,131,79,0.06)] hover:-translate-y-0.5 transition-all duration-300 p-4 group">
+    <article data-news-card="true" className="flex flex-col justify-between rounded-xl bg-white border border-[#e1ece5] hover:border-[#a7ccb5] hover:shadow-[0_4px_20px_rgba(22,131,79,0.06)] hover:-translate-y-0.5 transition-all duration-300 p-4 group">
       
       {/* Top Image */}
       <div 
@@ -132,7 +132,7 @@ export default function NewsCard({
         </div>
 
         {/* Card Footer */}
-        <div className="pt-3 border-t border-[#e1ece5] flex items-center justify-between gap-2">
+        <div className="news-card-footer pt-3 border-t border-[#e1ece5] flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => onOpenArticle(article)}

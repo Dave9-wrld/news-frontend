@@ -229,11 +229,11 @@ export default function HomePage() {
     };
   }, [searchTerm, activeQuery]);
 
-  const handleSearchSubmit = (e) => {
+  const handleSearchSubmit = (e, query = searchTerm) => {
     e?.preventDefault();
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    if (searchTerm.trim()) {
-      setActiveQuery(searchTerm.trim());
+    if (query.trim()) {
+      setActiveQuery(query.trim());
       setSelectedCategory("all");
       setSelectedSource("all");
       setPage(1);
@@ -290,14 +290,14 @@ export default function HomePage() {
   const gridArticles = articles.length > 1 ? articles.slice(1) : [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8faf9] text-[#112117] relative overflow-x-hidden pt-[112px]">
+    <div className="news-home min-h-screen flex flex-col bg-[#f8faf9] text-[#112117] relative overflow-x-hidden pt-[120px]">
       
       {/* Top Ambient Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[350px] bg-[radial-gradient(ellipse_at_top,rgba(22,131,79,0.04),transparent_70%)] pointer-events-none -z-10" />
 
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/95 backdrop-blur-md text-[#112117] border border-[#e1ece5] shadow-[0_10px_35px_rgba(0,0,0,0.08)] text-xs font-semibold animate-in fade-in slide-in-from-bottom-3">
+        <div role="status" className="news-toast fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/95 backdrop-blur-md text-[#112117] border border-[#e1ece5] shadow-[0_10px_35px_rgba(0,0,0,0.08)] text-xs font-semibold animate-in fade-in slide-in-from-bottom-3">
           <div className="w-5 h-5 rounded-full bg-[#eaf5ee] flex items-center justify-center text-[#16834f]">
             <Check className="w-3.5 h-3.5" />
           </div>
@@ -378,7 +378,7 @@ export default function HomePage() {
         ) : (
           <div>
             {/* Lead Story */}
-            {leadArticle && page === 1 && !activeQuery && (
+            {leadArticle && !activeQuery && (
               <HeroFeatured
                 article={leadArticle}
                 onOpenArticle={setActiveArticle}
@@ -394,7 +394,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between pb-3.5 mb-6 sm:mb-7 border-b border-[#e1ece5]">
               <div className="flex items-center gap-2.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#16834f]" />
-                <h2 className="text-base sm:text-lg font-bold font-editorial text-[#112117] uppercase tracking-wider">
+                <h2 className="break-words min-w-0 text-base sm:text-lg font-bold font-editorial text-[#112117] uppercase tracking-wider">
                   {activeQuery
                     ? `Search Results: "${activeQuery}"`
                     : selectedCategory !== "all"
@@ -406,7 +406,7 @@ export default function HomePage() {
 
             {/* Card Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-7">
-              {(activeQuery || page > 1 ? articles : gridArticles).map((article, idx) => (
+              {(activeQuery ? articles : gridArticles).map((article, idx) => (
                 <NewsCard
                   key={article.id || article.url || article.title || idx}
                   article={article}

@@ -92,3 +92,51 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Shared interaction styles and mobile safe areas. */
+:where(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid var(--brand-green);
+  outline-offset: 3px;
+}
+button { touch-action: manipulation; }
+button:disabled { cursor: wait; opacity: .65; }
+.account-dialog {
+  position: fixed; inset: 0 0 0 auto; margin: 0;
+  width: min(100%, 440px); max-width: 100%; height: 100dvh; max-height: 100dvh;
+  padding: 0; border: 0; color: var(--text-primary); background: var(--bg-card);
+  overscroll-behavior: contain;
+}
+.account-dialog[open] { animation: account-enter .25s ease-out; }
+.account-dialog::backdrop { background: rgb(8 25 16 / .55); backdrop-filter: blur(4px); }
+.account-panel { min-height: 100%; padding: 24px 24px max(24px, env(safe-area-inset-bottom)); }
+.icon-button { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border-radius: 12px; color: var(--text-secondary); }
+.icon-button:hover { background: var(--bg-muted); }
+.auth-label { display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600; }
+.auth-input { width: 100%; min-height: 50px; border: 1px solid var(--border-accent); border-radius: 12px; padding: 12px 14px; font-size: 16px; font-weight: 400; color: var(--text-primary); background: var(--bg-primary); }
+.auth-input.pr-14 { padding-right: 56px; }
+.auth-submit { display: flex; width: 100%; min-height: 50px; justify-content: center; align-items: center; gap: 10px; padding: 12px; border-radius: 12px; background: #16834f; color: white; font-size: 14px; font-weight: 600; transition: background .2s; }
+.auth-submit:hover:not(:disabled) { background: #126d41; }
+.account-notice { display: flex; align-items: flex-start; gap: 10px; padding: 14px; margin-bottom: 20px; border: 1px solid; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.account-error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.account-success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+.auth-progress { height: 3px; overflow: hidden; border-radius: 10px; background: var(--border-color); }
+.auth-progress span { display: block; width: 40%; height: 100%; background: var(--brand-green); animation: auth-progress 1.3s ease-in-out infinite; }
+.mobile-bottom-nav { padding-bottom: env(safe-area-inset-bottom, 0px); }
+@keyframes auth-progress { from { transform: translateX(-100%); } to { transform: translateX(350%); } }
+@keyframes account-enter { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@media (max-width: 1023px) {
+  .news-home { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  .news-toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); left: 16px; right: 16px; }
+  input, select, textarea { font-size: 16px !important; }
+  [data-news-card] button[aria-label], .lead-story button[aria-label] { min-height: 44px; min-width: 44px; }
+  [data-news-card] p { font-size: 14px; }
+  [data-news-card] h3 button { font-size: 20px; }
+  .news-card-footer { flex-wrap: wrap; row-gap: 10px; }
+  .news-card-footer > button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 1023px) {
+  .navbar-actions > button:not(:first-child) { display: none; }
+}

@@ -32,14 +32,14 @@ export default function HeroFeatured({
   };
 
   return (
-    <section className="w-full mb-8 sm:mb-12">
+    <section className="lead-story w-full mb-8 sm:mb-12">
       <div className="rounded-2xl bg-white border border-[#e1ece5] hover:border-[#a7ccb5] transition-all duration-300 p-4 sm:p-6 lg:p-7 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(22,131,79,0.06)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
           {/* Left 7 Cols: Cinematic Cover Image */}
           <div 
             onClick={() => onOpenArticle(article)}
-            className="lg:col-span-7 relative h-60 sm:h-80 lg:h-auto min-h-[260px] sm:min-h-[340px] rounded-xl overflow-hidden bg-[#f0f5f2] border border-[#e1ece5] group cursor-pointer"
+            className="lg:col-span-7 relative h-48 sm:h-80 lg:h-auto min-h-[190px] sm:min-h-[340px] rounded-xl overflow-hidden bg-[#f0f5f2] border border-[#e1ece5] group cursor-pointer"
           >
             <Image
               src={imageSrc}
@@ -104,7 +104,7 @@ export default function HeroFeatured({
                 </button>
               </h2>
 
-              <p className="text-[#455c50] text-xs sm:text-sm leading-relaxed line-clamp-3 sm:line-clamp-4 mb-4 sm:mb-6 font-sans">
+              <p className="text-[#455c50] text-sm leading-relaxed line-clamp-3 sm:line-clamp-4 mb-4 sm:mb-6 font-sans">
                 {article.description || "Read comprehensive reporting, official verified statements, and strategic context on this developing dispatch."}
               </p>
             </div>

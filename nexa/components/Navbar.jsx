@@ -29,6 +29,7 @@ export default function Navbar({
   const [currentDate, setCurrentDate] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const mobileInputRef = useRef(null);
+  const searchPanelRef = useRef(null);
 
   useEffect(() => {
     const now = new Date();
@@ -45,17 +46,32 @@ export default function Navbar({
   // Auto-focus mobile input when search modal opens & handle Escape key
   useEffect(() => {
     if (mobileSearchOpen) {
-      setTimeout(() => {
+      const previousFocus = document.activeElement;
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      const timer = setTimeout(() => {
         mobileInputRef.current?.focus();
       }, 100);
 
       const handleKeyDown = (e) => {
+        if (e.key === "Tab") {
+          const controls = searchPanelRef.current?.querySelectorAll('button, input');
+          const first = controls?.[0];
+          const last = controls?.[controls.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+        }
         if (e.key === "Escape") {
           setMobileSearchOpen(false);
         }
       };
       window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = previousOverflow;
+        previousFocus?.focus();
+      };
     }
   }, [mobileSearchOpen]);
 
@@ -69,17 +85,15 @@ export default function Navbar({
 
   const handleTrendingClick = (query) => {
     setSearchTerm(query);
-    setTimeout(() => {
-      onSearchSubmit({ preventDefault: () => {} });
-      setMobileSearchOpen(false);
-    }, 50);
+    onSearchSubmit(null, query);
+    setMobileSearchOpen(false);
   };
 
   return (
     <>
       <header className="w-full bg-white/95 backdrop-blur-md border-b border-[#e1ece5] fixed top-0 left-0 right-0 z-40 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-          <div className="flex items-center justify-between gap-4 sm:gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-col justify-center">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
 
             {/* Left: Logo & Masthead */}
             <div className="flex items-center gap-3 shrink-0">
@@ -89,7 +103,7 @@ export default function Navbar({
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5">
-                    <h1 className="text-base sm:text-lg font-bold tracking-tight text-[#112117] leading-none font-sans">
+                    <h1 className="text-[13px] sm:text-lg font-bold tracking-tight text-[#112117] leading-none font-sans">
                       {SITE_NAME.toUpperCase()}
                     </h1>
                   </div>
@@ -101,20 +115,20 @@ export default function Navbar({
             </div>
 
             {/* Center: Desktop Search */}
-            <div className="flex-1 max-w-md hidden md:block">
+            <div className="flex-1 max-w-md hidden lg:block">
               <form onSubmit={onSearchSubmit} className="relative group">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#738c7f] group-focus-within:text-[#16834f] transition-colors" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search headlines, stories, topics..."
+                  aria-label="Search news" placeholder="Search headlines, stories, topics..."
                   className="w-full pl-10 pr-9 py-2 text-xs sm:text-sm bg-[#f8faf9] border border-[#e1ece5] focus:border-[#16834f] focus:bg-white rounded-lg text-[#112117] placeholder-[#738c7f] focus:outline-none focus:ring-2 focus:ring-[#16834f]/20 transition-all shadow-xs"
                 />
                 {searchTerm && (
                   <button
                     type="button"
-                    onClick={onClearSearch}
+                    aria-label="Clear search" onClick={onClearSearch}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#738c7f] hover:text-[#112117] p-0.5 rounded transition-colors"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -124,13 +138,13 @@ export default function Navbar({
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="navbar-actions flex items-center gap-2 sm:gap-3 shrink-0">
               {/* Mobile Search Button */}
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(true)}
                 aria-label="Open search"
-                className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-[#f0f5f2] border border-[#e1ece5] text-[#455c50] hover:text-[#112117] hover:border-[#a7ccb5] transition-colors"
+                className="lg:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-[#f0f5f2] border border-[#e1ece5] text-[#455c50] hover:text-[#112117] hover:border-[#a7ccb5] transition-colors"
               >
                 <Search className="w-4 h-4 text-[#16834f]" />
               </button>
@@ -166,7 +180,7 @@ export default function Navbar({
                 <PenLine className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Publisher Studio</span>
               </button>
-              <button onClick={onOpenAccount} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#455c50] hover:text-[#112117] border border-[#e1ece5] hover:border-[#a7ccb5]">
+              <button onClick={onOpenAccount} aria-label={user ? "Open your account" : "Sign in"} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#455c50] hover:text-[#112117] border border-[#e1ece5] hover:border-[#a7ccb5]">
                 <UserRound className="w-3.5 h-3.5 text-[#16834f]" /> <span className="hidden sm:inline">{user ? user.username : "Sign in"}</span>
               </button>
             </div>
@@ -175,9 +189,18 @@ export default function Navbar({
         </div>
       </header>
 
-      {/* Modern, Highly-Accessible Mobile Search Modal Overlay */}
+      <nav aria-label="Quick actions" className="mobile-bottom-nav fixed bottom-0 inset-x-0 z-40 grid grid-cols-4 border-t border-[#e1ece5] bg-white/95 backdrop-blur-md lg:hidden">
+        {[
+          { label: "Briefing", Icon: Sparkles, action: onOpenBriefing },
+          { label: bookmarksCount ? `Saved (${bookmarksCount})` : "Saved", Icon: Bookmark, action: onOpenBookmarks },
+          { label: "Publish", Icon: PenLine, action: onOpenStudio },
+          { label: user ? "Account" : "Sign in", Icon: UserRound, action: onOpenAccount },
+        ].map(({ label, Icon, action }) => <button key={label} type="button" onClick={action} className="flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 text-[11px] font-semibold text-[#455c50] hover:bg-[#eaf5ee]"><Icon className="h-5 w-5 text-[#16834f]" /><span className="max-w-full truncate px-1">{label}</span></button>)}
+      </nav>
+
+      {/* Mobile search */}
       {mobileSearchOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-start animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-start animate-in fade-in duration-200">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-[#112117]/40 backdrop-blur-xs transition-opacity"
@@ -185,7 +208,7 @@ export default function Navbar({
           />
 
           {/* Search Box Drawer */}
-          <div className="relative w-full bg-white border-b border-[#e1ece5] shadow-xl p-4 sm:p-5 z-10">
+          <div ref={searchPanelRef} role="dialog" aria-modal="true" aria-label="Search news" className="relative w-full max-h-dvh overflow-y-auto bg-white border-b border-[#e1ece5] shadow-xl p-4 sm:p-5 z-10">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-[#16834f] uppercase tracking-wider font-mono">
                 <Search className="w-3.5 h-3.5" />
@@ -210,13 +233,13 @@ export default function Navbar({
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Type topic, event, or name..."
+                  aria-label="Search news" placeholder="Type topic, event, or name..."
                   className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#f8faf9] border border-[#e1ece5] focus:border-[#16834f] focus:bg-white rounded-lg text-[#112117] placeholder-[#738c7f] focus:outline-none focus:ring-2 focus:ring-[#16834f]/20 transition-all shadow-inner"
                 />
                 {searchTerm && (
                   <button
                     type="button"
-                    onClick={onClearSearch}
+                    aria-label="Clear search" onClick={onClearSearch}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#738c7f] hover:text-[#112117] p-1 rounded transition-colors"
                   >
                     <X className="w-4 h-4" />
